@@ -420,54 +420,69 @@
     .tier-details {
       background: var(--color-gray-100);
       border-radius: var(--radius-md);
-      padding: var(--space-md);
+      padding: var(--space-lg);
       margin-top: var(--space-sm);
-      font-size: 0.8125rem;
+      font-size: 0.875rem;
     }
 
-    .tier-details-header {
-      color: var(--color-gray-600);
-      margin-bottom: var(--space-sm);
-      padding-bottom: var(--space-sm);
-      border-bottom: 1px dashed var(--color-gray-300);
+    .tier-explainer {
+      margin-bottom: var(--space-md);
+      line-height: 1.6;
     }
 
-    .tier-detail-row {
-      display: grid;
-      grid-template-columns: 40px 1fr 20px auto;
-      gap: var(--space-xs);
-      padding: var(--space-xs) 0;
-      align-items: center;
-    }
-
-    .tier-rate {
-      font-weight: 600;
-      color: var(--color-red);
-    }
-
-    .tier-of {
-      color: var(--color-gray-600);
-    }
-
-    .tier-equals {
-      color: var(--color-gray-400);
-      text-align: center;
-    }
-
-    .tier-result {
-      text-align: right;
+    .tier-explainer p {
+      margin: 0 0 var(--space-xs) 0;
       color: var(--color-gray-700);
-      font-weight: 500;
+    }
+
+    .tier-breakdown-list {
+      background: var(--color-white);
+      border-radius: var(--radius-sm);
+      padding: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+
+    .tier-detail-item {
+      padding: var(--space-sm);
+      border-bottom: 1px solid var(--color-gray-200);
+    }
+
+    .tier-detail-item:last-child {
+      border-bottom: none;
+    }
+
+    .tier-detail-label {
+      font-size: 0.75rem;
+      color: var(--color-gray-500);
+      margin-bottom: 2px;
+    }
+
+    .tier-detail-calc {
+      color: var(--color-gray-700);
+    }
+
+    .tier-detail-calc strong {
+      color: var(--color-red);
     }
 
     .tier-detail-total {
       display: flex;
       justify-content: space-between;
-      margin-top: var(--space-sm);
-      padding-top: var(--space-sm);
-      border-top: 1px solid var(--color-gray-300);
+      padding: var(--space-sm);
+      background: var(--color-black);
+      color: var(--color-white);
+      border-radius: var(--radius-sm);
       font-weight: 600;
-      color: var(--color-black);
+      margin-bottom: var(--space-md);
+    }
+
+    .tier-tip {
+      font-size: 0.8125rem;
+      color: var(--color-gray-600);
+      padding: var(--space-sm);
+      background: rgba(204, 0, 0, 0.05);
+      border-radius: var(--radius-sm);
+      border-left: 3px solid var(--color-red);
     }
 
     .footer {
@@ -721,20 +736,40 @@
                   
                   {showTierDetails && (
                     <div className="tier-details">
-                      <div className="tier-details-header">
-                        <span>Your revenue: {formatCurrency(result.netRevenue)}</span>
+                      <div className="tier-explainer">
+                        <p><strong>Here's how your commission is calculated:</strong></p>
+                        <p>You did <strong>{result.cuts} haircuts</strong> at $38 each = <strong>{formatCurrency(result.grossRevenue)}</strong> in services.</p>
+                        <p>After the 10% service fee, your commissionable revenue is <strong>{formatCurrency(result.netRevenue)}</strong>.</p>
+                        <p style={{marginTop: '0.75rem'}}>Your commission rate <em>increases</em> as you earn more:</p>
                       </div>
-                      {result.commissionBreakdown.map((tier, index) => (
-                        <div key={index} className="tier-detail-row">
-                          <span className="tier-rate">{tier.rate}</span>
-                          <span className="tier-of">of {formatCurrency(tier.amount)}</span>
-                          <span className="tier-equals">=</span>
-                          <span className="tier-result">{formatCurrency(tier.commission)}</span>
-                        </div>
-                      ))}
+                      
+                      <div className="tier-breakdown-list">
+                        {result.commissionBreakdown.map((tier, index) => {
+                          const tierLabels = [
+                            'On your first $1,300',
+                            'On the next $300 (from $1,300 to $1,600)',
+                            'On the next $200 (from $1,600 to $1,800)',
+                            'On the next $200 (from $1,800 to $2,000)',
+                            'On everything above $2,000'
+                          ];
+                          return (
+                            <div key={index} className="tier-detail-item">
+                              <div className="tier-detail-label">{tierLabels[index] || `Tier ${index + 1}`}</div>
+                              <div className="tier-detail-calc">
+                                You earned {formatCurrency(tier.amount)} in this tier × {tier.rate} = <strong>{formatCurrency(tier.commission)}</strong>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      
                       <div className="tier-detail-total">
-                        <span>Total Commission</span>
+                        <span>Your Total Commission</span>
                         <span>{formatCurrency(result.commission)}</span>
+                      </div>
+                      
+                      <div className="tier-tip">
+                        💡 <strong>Tip:</strong> The more cuts you do, the higher your rate goes! Top performers earn 50% on revenue above $2,000.
                       </div>
                     </div>
                   )}

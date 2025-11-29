@@ -3,25 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Floyd's Barbershop Pay Calculator - Estimate your weekly earnings">
+  <meta name="description" content="Floyd's Barbershop Pay Calculator - See what you could earn as a Floyd's stylist">
   <title>Floyd's Pay Calculator</title>
   
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- React via CDN -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   
   <style>
-    /* ═══════════════════════════════════════════════════════════════════════════
-       FLOYD'S PAY CALCULATOR - STYLES
-       Brand Colors: Black (#000), White (#fff), Red (#CC0000)
-       ═══════════════════════════════════════════════════════════════════════════ */
-
     :root {
       --color-black: #000000;
       --color-white: #ffffff;
@@ -35,7 +28,7 @@
       --color-gray-500: #888888;
       --color-gray-600: #666666;
       --color-gray-700: #444444;
-      --color-gray-800: #222222;
+      --color-green: #22C55E;
       --font-heading: 'Bebas Neue', 'Impact', sans-serif;
       --font-body: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       --space-xs: 0.25rem;
@@ -51,44 +44,18 @@
       --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
       --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
       --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
-      --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.2);
       --transition-fast: 150ms ease;
-      --transition-normal: 250ms ease;
     }
 
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      font-size: 16px;
-      -webkit-font-smoothing: antialiased;
-    }
-
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+    
     body {
       font-family: var(--font-body);
-      background: linear-gradient(135deg, var(--color-gray-100) 0%, var(--color-white) 50%, var(--color-gray-100) 100%);
+      background: linear-gradient(180deg, var(--color-black) 0%, var(--color-black) 200px, var(--color-gray-100) 200px);
       color: var(--color-black);
       line-height: 1.5;
       min-height: 100vh;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-image: 
-        linear-gradient(45deg, transparent 48%, var(--color-gray-200) 49%, var(--color-gray-200) 51%, transparent 52%),
-        linear-gradient(-45deg, transparent 48%, var(--color-gray-200) 49%, var(--color-gray-200) 51%, transparent 52%);
-      background-size: 60px 60px;
-      opacity: 0.3;
-      pointer-events: none;
-      z-index: -1;
     }
 
     .calculator-container {
@@ -98,80 +65,111 @@
       padding-bottom: var(--space-2xl);
     }
 
-    @media (min-width: 768px) {
-      .calculator-container { padding: var(--space-xl); }
-    }
-
     .header {
       text-align: center;
       padding: var(--space-xl) 0;
-      margin-bottom: var(--space-lg);
-      animation: fadeInDown 0.6s ease-out;
+      color: var(--color-white);
     }
-
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .logo { margin-bottom: var(--space-md); }
 
     .logo-text {
-      display: block;
       font-family: var(--font-heading);
-      font-size: 3.5rem;
+      font-size: 2.5rem;
       letter-spacing: 0.15em;
-      color: var(--color-black);
+      color: var(--color-white);
       line-height: 1;
     }
 
     .logo-subtext {
-      display: block;
-      font-family: var(--font-body);
-      font-size: 0.875rem;
+      font-size: 0.75rem;
       letter-spacing: 0.3em;
       color: var(--color-red);
       font-weight: 600;
       margin-top: var(--space-xs);
     }
 
-    .title {
-      font-family: var(--font-body);
-      font-size: 1.5rem;
-      font-weight: 300;
-      color: var(--color-gray-700);
+    .header-tagline {
+      font-size: 1rem;
+      color: var(--color-gray-400);
+      margin-top: var(--space-md);
+    }
+
+    /* Main Pay Display */
+    .pay-display {
+      background: var(--color-white);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+      margin-bottom: var(--space-lg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pay-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--color-gray-500);
       margin-bottom: var(--space-xs);
     }
 
-    .subtitle {
-      font-size: 0.875rem;
-      color: var(--color-gray-500);
+    .pay-amount {
+      font-family: var(--font-heading);
+      font-size: 4rem;
+      color: var(--color-black);
+      line-height: 1;
     }
 
+    .pay-per-hour {
+      display: inline-block;
+      margin-top: var(--space-md);
+      padding: var(--space-xs) var(--space-md);
+      background: var(--color-gray-100);
+      border-radius: var(--radius-sm);
+      font-size: 1.125rem;
+      color: var(--color-gray-700);
+    }
+
+    .pay-per-hour strong {
+      color: var(--color-red);
+      font-weight: 700;
+    }
+
+    .guarantee-note {
+      margin-top: var(--space-md);
+      padding: var(--space-sm) var(--space-md);
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid var(--color-green);
+      border-radius: var(--radius-sm);
+      font-size: 0.8125rem;
+      color: var(--color-green);
+    }
+
+    /* Input Section */
     .input-section {
-      margin-bottom: var(--space-xl);
-      animation: fadeInUp 0.6s ease-out 0.1s both;
-    }
-
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .input-card {
       background: var(--color-white);
       border-radius: var(--radius-xl);
       padding: var(--space-xl);
       box-shadow: var(--shadow-lg);
-      border: 1px solid var(--color-gray-200);
+      margin-bottom: var(--space-lg);
+    }
+
+    .section-title {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      letter-spacing: 0.05em;
+      color: var(--color-black);
+      margin-bottom: var(--space-lg);
+      text-align: center;
     }
 
     .input-group {
       margin-bottom: var(--space-xl);
     }
 
-    .input-group:last-of-type {
-      margin-bottom: var(--space-lg);
+    .input-group:last-child {
+      margin-bottom: 0;
     }
 
     .input-group label {
@@ -193,12 +191,6 @@
       color: var(--color-red);
     }
 
-    .label-optional {
-      font-size: 0.75rem;
-      color: var(--color-gray-500);
-      font-weight: 400;
-    }
-
     .slider {
       -webkit-appearance: none;
       appearance: none;
@@ -213,19 +205,12 @@
 
     .slider::-webkit-slider-thumb {
       -webkit-appearance: none;
-      appearance: none;
       width: 28px;
       height: 28px;
       background: var(--color-red);
       border-radius: 50%;
       cursor: pointer;
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
       box-shadow: 0 2px 8px rgba(204, 0, 0, 0.4);
-    }
-
-    .slider::-webkit-slider-thumb:hover {
-      transform: scale(1.15);
-      box-shadow: 0 4px 12px rgba(204, 0, 0, 0.5);
     }
 
     .slider::-moz-range-thumb {
@@ -235,7 +220,6 @@
       border-radius: 50%;
       cursor: pointer;
       border: none;
-      box-shadow: 0 2px 8px rgba(204, 0, 0, 0.4);
     }
 
     .slider-labels {
@@ -243,36 +227,18 @@
       justify-content: space-between;
       font-size: 0.75rem;
       color: var(--color-gray-500);
-      margin-bottom: var(--space-md);
-    }
-
-    .number-input {
-      width: 100%;
-      padding: var(--space-md);
-      font-size: 1rem;
-      font-family: var(--font-body);
-      border: 2px solid var(--color-gray-300);
-      border-radius: var(--radius-md);
-      background: var(--color-gray-100);
-      transition: border-color var(--transition-fast), background var(--transition-fast);
-      text-align: center;
-    }
-
-    .number-input:focus {
-      outline: none;
-      border-color: var(--color-red);
-      background: var(--color-white);
     }
 
     .currency-input-wrapper {
       position: relative;
-      display: flex;
-      align-items: center;
+      margin-top: var(--space-sm);
     }
 
     .currency-symbol {
       position: absolute;
       left: var(--space-md);
+      top: 50%;
+      transform: translateY(-50%);
       font-size: 1.25rem;
       font-weight: 600;
       color: var(--color-gray-600);
@@ -287,7 +253,6 @@
       border: 2px solid var(--color-gray-300);
       border-radius: var(--radius-md);
       background: var(--color-gray-100);
-      transition: border-color var(--transition-fast), background var(--transition-fast);
     }
 
     .currency-input:focus {
@@ -296,301 +261,214 @@
       background: var(--color-white);
     }
 
-    .input-note {
+    .input-hint {
       font-size: 0.75rem;
       color: var(--color-gray-500);
       margin-top: var(--space-sm);
-      font-style: italic;
     }
 
-    .toggle-group {
-      display: flex;
-      justify-content: center;
-      margin-bottom: var(--space-lg);
-    }
-
-    .toggle-label {
-      display: flex;
-      align-items: center;
-      gap: var(--space-sm);
-      cursor: pointer;
-    }
-
-    .toggle-label input { display: none; }
-
-    .toggle-slider {
-      width: 48px;
-      height: 26px;
-      background: var(--color-gray-300);
-      border-radius: 13px;
-      position: relative;
-      transition: background var(--transition-fast);
-    }
-
-    .toggle-slider::after {
-      content: '';
-      position: absolute;
-      top: 3px;
-      left: 3px;
-      width: 20px;
-      height: 20px;
-      background: var(--color-white);
-      border-radius: 50%;
-      transition: transform var(--transition-fast);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .toggle-label input:checked + .toggle-slider { background: var(--color-red); }
-    .toggle-label input:checked + .toggle-slider::after { transform: translateX(22px); }
-
-    .toggle-text {
-      font-size: 0.875rem;
-      color: var(--color-gray-600);
-    }
-
-    .calculate-btn {
-      width: 100%;
-      padding: var(--space-md) var(--space-xl);
-      font-size: 1.125rem;
-      font-family: var(--font-heading);
-      letter-spacing: 0.1em;
-      color: var(--color-white);
-      background: var(--color-red);
-      border: none;
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      transition: background var(--transition-fast), transform var(--transition-fast);
-      box-shadow: 0 4px 15px rgba(204, 0, 0, 0.3);
-    }
-
-    .calculate-btn:hover {
-      background: var(--color-red-dark);
-      transform: translateY(-2px);
-    }
-
-    .calculate-btn:active { transform: translateY(0); }
-
-    .results-section { animation: fadeInUp 0.6s ease-out 0.2s both; }
-
-    .total-pay-card {
-      background: var(--color-black);
-      color: var(--color-white);
-      border-radius: var(--radius-xl);
-      padding: var(--space-xl);
-      text-align: center;
-      margin-bottom: var(--space-lg);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .total-pay-card::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(45deg, transparent 30%, rgba(204, 0, 0, 0.1) 50%, transparent 70%);
-      animation: shimmer 3s infinite;
-    }
-
-    @keyframes shimmer {
-      0% { transform: translateX(-50%) translateY(-50%) rotate(0deg); }
-      100% { transform: translateX(50%) translateY(50%) rotate(0deg); }
-    }
-
-    .total-pay-label {
-      font-size: 0.875rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--color-gray-400);
-      margin-bottom: var(--space-sm);
-      position: relative;
-    }
-
-    .total-pay-amount {
-      font-family: var(--font-heading);
-      font-size: 4rem;
-      color: var(--color-white);
-      line-height: 1;
-      margin-bottom: var(--space-md);
-      position: relative;
-    }
-
-    .effective-rate {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: var(--space-sm);
-      font-size: 1.125rem;
-      position: relative;
-    }
-
-    .rate-label { color: var(--color-gray-400); }
-    .rate-value { color: var(--color-red); font-weight: 600; }
-
-    .guarantee-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--space-xs);
-      margin-top: var(--space-md);
-      padding: var(--space-xs) var(--space-md);
-      background: rgba(204, 0, 0, 0.2);
-      border: 1px solid var(--color-red);
+    .bonus-indicator {
+      display: inline-block;
+      padding: 2px 8px;
+      background: var(--color-green);
+      color: white;
       border-radius: var(--radius-sm);
       font-size: 0.75rem;
-      color: var(--color-red-light);
-      position: relative;
+      font-weight: 600;
     }
 
-    .guarantee-icon { font-size: 0.875rem; }
+    .no-bonus {
+      background: var(--color-gray-400);
+    }
 
-    .breakdown-card {
+    /* Earnings Breakdown */
+    .breakdown-section {
       background: var(--color-white);
       border-radius: var(--radius-xl);
       padding: var(--space-xl);
       box-shadow: var(--shadow-lg);
-      border: 1px solid var(--color-gray-200);
       margin-bottom: var(--space-lg);
-    }
-
-    .breakdown-title {
-      font-family: var(--font-heading);
-      font-size: 1.5rem;
-      letter-spacing: 0.05em;
-      color: var(--color-black);
-      margin-bottom: var(--space-lg);
-      padding-bottom: var(--space-sm);
-      border-bottom: 2px solid var(--color-red);
-    }
-
-    .breakdown-group {
-      margin-bottom: var(--space-lg);
-      padding-bottom: var(--space-lg);
-      border-bottom: 1px solid var(--color-gray-200);
-    }
-
-    .breakdown-group:last-child {
-      margin-bottom: 0;
-      padding-bottom: 0;
-      border-bottom: none;
-    }
-
-    .group-title {
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      color: var(--color-gray-500);
-      margin-bottom: var(--space-md);
     }
 
     .breakdown-row {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       padding: var(--space-sm) 0;
+      border-bottom: 1px solid var(--color-gray-200);
     }
 
-    .breakdown-row.highlight {
-      background: var(--color-gray-100);
-      margin: 0 calc(-1 * var(--space-md));
-      padding: var(--space-sm) var(--space-md);
-      border-radius: var(--radius-sm);
+    .breakdown-row:last-child {
+      border-bottom: none;
     }
 
-    .row-label {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      font-size: 0.9375rem;
+    .breakdown-label {
       color: var(--color-gray-700);
+      font-size: 0.9375rem;
     }
 
-    .row-detail {
+    .breakdown-sublabel {
+      display: block;
       font-size: 0.75rem;
       color: var(--color-gray-500);
     }
 
-    .row-value {
+    .breakdown-value {
       font-weight: 600;
-      font-size: 0.9375rem;
       color: var(--color-black);
-      white-space: nowrap;
+      font-size: 0.9375rem;
     }
 
-    .tier-breakdown {
-      margin-top: var(--space-sm);
-      padding-left: var(--space-md);
-      border-left: 3px solid var(--color-gray-200);
-    }
-
-    .tier-row {
-      display: grid;
-      grid-template-columns: 40px 1fr auto;
-      gap: var(--space-sm);
-      padding: var(--space-xs) 0;
-      font-size: 0.8125rem;
-      color: var(--color-gray-600);
-    }
-
-    .tier-rate { font-weight: 600; color: var(--color-red); }
-    .tier-range { color: var(--color-gray-500); }
-    .tier-result { text-align: right; color: var(--color-gray-700); }
-
-    .breakdown-group.summary .breakdown-row { padding: var(--space-sm) 0; }
-
-    .breakdown-group.summary .breakdown-row.total {
-      margin-top: var(--space-sm);
+    .breakdown-total {
+      margin-top: var(--space-md);
       padding-top: var(--space-md);
       border-top: 2px solid var(--color-black);
     }
 
-    .breakdown-row.total .row-label {
+    .breakdown-total .breakdown-label {
       font-weight: 700;
-      font-size: 1rem;
       color: var(--color-black);
     }
 
-    .breakdown-row.total .row-value {
+    .breakdown-total .breakdown-value {
       font-size: 1.25rem;
       color: var(--color-red);
     }
 
-    .info-card {
+    .or-divider {
+      text-align: center;
+      color: var(--color-gray-500);
+      font-size: 0.75rem;
+      padding: var(--space-xs) 0;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* How It Works */
+    .info-section {
       background: var(--color-gray-100);
-      border-radius: var(--radius-lg);
-      padding: var(--space-lg);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
       border-left: 4px solid var(--color-red);
     }
 
-    .info-card h3 {
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--color-black);
+    .info-section h3 {
+      font-family: var(--font-heading);
+      font-size: 1.125rem;
       margin-bottom: var(--space-md);
     }
 
-    .info-card ul { list-style: none; }
+    .info-grid {
+      display: grid;
+      gap: var(--space-md);
+    }
 
-    .info-card li {
-      position: relative;
-      padding-left: var(--space-lg);
-      margin-bottom: var(--space-sm);
+    .info-item {
+      background: var(--color-white);
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+    }
+
+    .info-item h4 {
       font-size: 0.8125rem;
-      color: var(--color-gray-600);
-      line-height: 1.6;
-    }
-
-    .info-card li::before {
-      content: '•';
-      position: absolute;
-      left: var(--space-sm);
+      font-weight: 600;
       color: var(--color-red);
-      font-weight: bold;
+      margin-bottom: var(--space-xs);
     }
 
-    .info-card li strong { color: var(--color-gray-700); }
+    .info-item p {
+      font-size: 0.8125rem;
+      color: var(--color-gray-700);
+      margin: 0;
+    }
+
+    .tier-mini-table {
+      font-size: 0.75rem;
+      margin-top: var(--space-xs);
+    }
+
+    .tier-mini-table span {
+      display: inline-block;
+      padding: 2px 6px;
+      background: var(--color-gray-100);
+      border-radius: 3px;
+      margin: 2px;
+    }
+
+    .tier-details-wrapper {
+      margin-top: -0.5rem;
+      margin-bottom: var(--space-sm);
+    }
+
+    .tier-toggle {
+      background: none;
+      border: none;
+      color: var(--color-red);
+      font-size: 0.75rem;
+      font-family: var(--font-body);
+      cursor: pointer;
+      padding: var(--space-xs) 0;
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    .tier-toggle:hover {
+      text-decoration: underline;
+    }
+
+    .tier-details {
+      background: var(--color-gray-100);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      margin-top: var(--space-sm);
+      font-size: 0.8125rem;
+    }
+
+    .tier-details-header {
+      color: var(--color-gray-600);
+      margin-bottom: var(--space-sm);
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px dashed var(--color-gray-300);
+    }
+
+    .tier-detail-row {
+      display: grid;
+      grid-template-columns: 40px 1fr 20px auto;
+      gap: var(--space-xs);
+      padding: var(--space-xs) 0;
+      align-items: center;
+    }
+
+    .tier-rate {
+      font-weight: 600;
+      color: var(--color-red);
+    }
+
+    .tier-of {
+      color: var(--color-gray-600);
+    }
+
+    .tier-equals {
+      color: var(--color-gray-400);
+      text-align: center;
+    }
+
+    .tier-result {
+      text-align: right;
+      color: var(--color-gray-700);
+      font-weight: 500;
+    }
+
+    .tier-detail-total {
+      display: flex;
+      justify-content: space-between;
+      margin-top: var(--space-sm);
+      padding-top: var(--space-sm);
+      border-top: 1px solid var(--color-gray-300);
+      font-weight: 600;
+      color: var(--color-black);
+    }
 
     .footer {
       text-align: center;
@@ -600,9 +478,8 @@
     }
 
     @media (max-width: 400px) {
-      .logo-text { font-size: 2.75rem; }
-      .total-pay-amount { font-size: 3rem; }
-      .tier-row { grid-template-columns: 35px 1fr auto; font-size: 0.75rem; }
+      .logo-text { font-size: 2rem; }
+      .pay-amount { font-size: 3rem; }
     }
 
     input[type="number"]::-webkit-inner-spin-button,
@@ -621,33 +498,18 @@
   <div id="root"></div>
 
   <script type="text/babel">
-    /**
-     * Floyd's Barbershop Weekly Pay Calculator
-     * 
-     * Commission Tiers (applied progressively to net revenue):
-     * - First $1,300: 42%
-     * - $1,300 - $1,600: 44%
-     * - $1,600 - $1,800: 46%
-     * - $1,800 - $2,000: 48%
-     * - Over $2,000: 50%
-     */
-
     const { useState, useEffect, useCallback } = React;
 
     function FloydsPayCalculator() {
-      // ═══════════════════════════════════════════════════════════════════════════
-      // CONSTANTS - Floyd's Pay Structure
-      // ═══════════════════════════════════════════════════════════════════════════
-      
-      const SERVICE_PRICE = 36;                    // $36 per haircut/service
-      const SERVICE_FEE_RATE = 0.10;               // 10% fee deducted
-      const TIP_RATE = 0.20;                       // 20% average tip rate
-      const RETAIL_COMMISSION_RATE = 0.10;         // 10% commission on all retail sales
-      const RETAIL_THRESHOLD = 500;                // Must sell $500+ in retail to earn bonus
-      const RETAIL_BONUS_AMOUNT = 50;              // Additional $50 bonus if threshold is met
-      const HOURLY_WAGE = 15;                      // $15/hour guarantee rate
+      // Pay structure constants
+      const SERVICE_PRICE = 36;
+      const SERVICE_FEE_RATE = 0.10;
+      const TIP_RATE = 0.20;
+      const RETAIL_COMMISSION_RATE = 0.10;
+      const RETAIL_THRESHOLD = 500;
+      const RETAIL_BONUS_AMOUNT = 50;
+      const HOURLY_WAGE = 15;
 
-      // Commission tier thresholds and rates
       const COMMISSION_TIERS = [
         { threshold: 1300, rate: 0.42, label: '42%' },
         { threshold: 1600, rate: 0.44, label: '44%' },
@@ -656,19 +518,12 @@
         { threshold: Infinity, rate: 0.50, label: '50%' },
       ];
 
-      // ═══════════════════════════════════════════════════════════════════════════
-      // STATE
-      // ═══════════════════════════════════════════════════════════════════════════
-      
-      const [weeklyCuts, setWeeklyCuts] = useState(25);
+      // User inputs
+      const [weeklyCuts, setWeeklyCuts] = useState(50);
       const [weeklyRetailSales, setWeeklyRetailSales] = useState(200);
       const [hoursPerWeek, setHoursPerWeek] = useState(32);
       const [result, setResult] = useState(null);
-      const [isLiveUpdate, setIsLiveUpdate] = useState(true);
-
-      // ═══════════════════════════════════════════════════════════════════════════
-      // CALCULATION LOGIC
-      // ═══════════════════════════════════════════════════════════════════════════
+      const [showTierDetails, setShowTierDetails] = useState(false);
 
       const calculateTieredCommission = useCallback((netRevenue) => {
         let commission = 0;
@@ -678,7 +533,6 @@
 
         for (const tier of COMMISSION_TIERS) {
           if (remaining <= 0) break;
-          
           const tierSize = tier.threshold - prevThreshold;
           const amountInTier = Math.min(remaining, tierSize);
           const tierCommission = amountInTier * tier.rate;
@@ -704,38 +558,18 @@
         const retailSales = parseFloat(weeklyRetailSales) || 0;
         const hours = parseFloat(hoursPerWeek) || 32;
         
-        // Calculate hourly guarantee based on hours worked
         const hourlyGuaranteePay = HOURLY_WAGE * hours;
-        
-        // Step 1: Gross and net service revenue
         const grossRevenue = cuts * SERVICE_PRICE;
         const netRevenue = grossRevenue * (1 - SERVICE_FEE_RATE);
-        
-        // Step 2: Tiered commission
         const commissionResult = calculateTieredCommission(netRevenue);
         const commission = commissionResult.total;
-        
-        // Step 3: Tips (20% of GROSS)
         const tips = grossRevenue * TIP_RATE;
-        
-        // Step 4: Retail earnings
-        // 10% commission on ALL retail sales
         const retailCommission = retailSales * RETAIL_COMMISSION_RATE;
-        // Additional $50 bonus if weekly retail sales >= $500
         const retailBonus = retailSales >= RETAIL_THRESHOLD ? RETAIL_BONUS_AMOUNT : 0;
-        const retailThresholdMet = retailSales >= RETAIL_THRESHOLD;
-        // Total retail = commission + bonus
         const totalRetail = retailCommission + retailBonus;
-        
-        // Step 5: Base pay = commission + tips + total retail
         const basePay = commission + tips + totalRetail;
-        
-        // Step 6: Apply guarantee
         const totalPay = Math.max(basePay, hourlyGuaranteePay);
         const guaranteeApplied = basePay < hourlyGuaranteePay;
-        const guaranteeAmount = guaranteeApplied ? hourlyGuaranteePay - basePay : 0;
-        
-        // Step 7: Effective hourly
         const effectiveHourly = hours > 0 ? totalPay / hours : 0;
 
         return {
@@ -751,279 +585,226 @@
           retailCommission,
           retailBonus,
           totalRetail,
-          retailThresholdMet,
           basePay,
           totalPay,
           effectiveHourly,
           guaranteeApplied,
-          guaranteeAmount,
         };
       }, [weeklyCuts, weeklyRetailSales, hoursPerWeek, calculateTieredCommission]);
 
-      // ═══════════════════════════════════════════════════════════════════════════
-      // EFFECTS
-      // ═══════════════════════════════════════════════════════════════════════════
-
-      useEffect(() => {
-        if (isLiveUpdate) {
-          setResult(calculatePay());
-        }
-      }, [weeklyCuts, weeklyRetailSales, hoursPerWeek, isLiveUpdate, calculatePay]);
-
       useEffect(() => {
         setResult(calculatePay());
-      }, []);
-
-      const handleRecalculate = () => {
-        setResult(calculatePay());
-      };
+      }, [weeklyCuts, weeklyRetailSales, hoursPerWeek, calculatePay]);
 
       const formatCurrency = (amount) => {
         return new Intl.NumberFormat('en-US', {
           style: 'currency',
           currency: 'USD',
           minimumFractionDigits: 0,
-          maximumFractionDigits: 2,
+          maximumFractionDigits: 0,
         }).format(amount);
       };
-
-      // ═══════════════════════════════════════════════════════════════════════════
-      // RENDER
-      // ═══════════════════════════════════════════════════════════════════════════
 
       return (
         <div className="calculator-container">
           <header className="header">
-            <div className="logo">
-              <span className="logo-text">FLOYD'S</span>
-              <span className="logo-subtext">99 BARBERSHOP</span>
-            </div>
-            <h1 className="title">Pay Calculator</h1>
-            <p className="subtitle">Estimate your weekly earnings as a Floyd's stylist</p>
+            <div className="logo-text">FLOYD'S</div>
+            <div className="logo-subtext">99 BARBERSHOP</div>
+            <p className="header-tagline">See what you could earn</p>
           </header>
 
-          <section className="input-section">
-            <div className="input-card">
-              <div className="input-group">
-                <label htmlFor="cuts-slider">
-                  <span className="label-text">Expected Cuts Per Week</span>
-                  <span className="label-value">{weeklyCuts} cuts</span>
-                </label>
-                <input
-                  type="range"
-                  id="cuts-slider"
-                  min="0"
-                  max="80"
-                  value={weeklyCuts}
-                  onChange={(e) => setWeeklyCuts(parseInt(e.target.value))}
-                  className="slider"
-                />
-                <div className="slider-labels">
-                  <span>0</span>
-                  <span>20</span>
-                  <span>40</span>
-                  <span>60</span>
-                  <span>80</span>
+          {/* Big Pay Number */}
+          {result && (
+            <div className="pay-display">
+              <div className="pay-label">Your Weekly Pay</div>
+              <div className="pay-amount">{formatCurrency(result.totalPay)}</div>
+              <div className="pay-per-hour">
+                That's <strong>{formatCurrency(result.effectiveHourly)}/hr</strong>
+              </div>
+              {result.guaranteeApplied && (
+                <div className="guarantee-note">
+                  ✓ Your $15/hr guarantee kicked in — you're covered!
                 </div>
-                <input
-                  type="number"
-                  value={weeklyCuts}
-                  onChange={(e) => setWeeklyCuts(Math.max(0, parseInt(e.target.value) || 0))}
-                  className="number-input"
-                  placeholder="Or enter a number"
-                  min="0"
-                />
-              </div>
-
-              <div className="input-group">
-                <label htmlFor="retail-input">
-                  <span className="label-text">Weekly Retail Sales</span>
-                  <span className="label-value">{weeklyRetailSales >= 500 ? '✓ $50 bonus' : 'No bonus'}</span>
-                </label>
-                <div className="currency-input-wrapper">
-                  <span className="currency-symbol">$</span>
-                  <input
-                    type="number"
-                    id="retail-input"
-                    value={weeklyRetailSales || ''}
-                    onChange={(e) => setWeeklyRetailSales(Math.max(0, parseFloat(e.target.value) || 0))}
-                    className="currency-input"
-                    placeholder="0"
-                    min="0"
-                  />
-                </div>
-                <p className="input-note">
-                  * Sell $500+ in retail products to earn a $50 weekly bonus
-                </p>
-              </div>
-
-              <div className="input-group">
-                <label htmlFor="hours-input">
-                  <span className="label-text">Hours Per Week</span>
-                  <span className="label-value">{hoursPerWeek} hrs</span>
-                </label>
-                <input
-                  type="range"
-                  id="hours-slider"
-                  min="10"
-                  max="40"
-                  value={hoursPerWeek}
-                  onChange={(e) => setHoursPerWeek(parseInt(e.target.value))}
-                  className="slider"
-                />
-                <div className="slider-labels">
-                  <span>10</span>
-                  <span>20</span>
-                  <span>30</span>
-                  <span>40</span>
-                </div>
-                <input
-                  type="number"
-                  value={hoursPerWeek}
-                  onChange={(e) => setHoursPerWeek(Math.min(40, Math.max(1, parseInt(e.target.value) || 32)))}
-                  className="number-input"
-                  placeholder="32"
-                  min="1"
-                  max="40"
-                />
-              </div>
-
-              <div className="toggle-group">
-                <label className="toggle-label">
-                  <input
-                    type="checkbox"
-                    checked={isLiveUpdate}
-                    onChange={(e) => setIsLiveUpdate(e.target.checked)}
-                  />
-                  <span className="toggle-slider"></span>
-                  <span className="toggle-text">Live updates</span>
-                </label>
-              </div>
-
-              {!isLiveUpdate && (
-                <button className="calculate-btn" onClick={handleRecalculate}>
-                  Recalculate
-                </button>
               )}
             </div>
-          </section>
-
-          {result && (
-            <section className="results-section">
-              <div className="total-pay-card">
-                <div className="total-pay-label">Total Weekly Pay</div>
-                <div className="total-pay-amount">{formatCurrency(result.totalPay)}</div>
-                <div className="effective-rate">
-                  <span className="rate-label">Effective Rate:</span>
-                  <span className="rate-value">{formatCurrency(result.effectiveHourly)}/hr</span>
-                </div>
-                {result.guaranteeApplied && (
-                  <div className="guarantee-badge">
-                    <span className="guarantee-icon">✓</span>
-                    Hourly guarantee applied (+{formatCurrency(result.guaranteeAmount)})
-                  </div>
-                )}
-              </div>
-
-              <div className="breakdown-card">
-                <h2 className="breakdown-title">Earnings Breakdown</h2>
-                
-                <div className="breakdown-group">
-                  <h3 className="group-title">Service Revenue</h3>
-                  <div className="breakdown-row">
-                    <span className="row-label">
-                      Gross Revenue
-                      <span className="row-detail">({result.cuts} cuts × $36)</span>
-                    </span>
-                    <span className="row-value">{formatCurrency(result.grossRevenue)}</span>
-                  </div>
-                  <div className="breakdown-row">
-                    <span className="row-label">
-                      Net Revenue
-                      <span className="row-detail">(after 10% service fee)</span>
-                    </span>
-                    <span className="row-value">{formatCurrency(result.netRevenue)}</span>
-                  </div>
-                </div>
-
-                <div className="breakdown-group">
-                  <h3 className="group-title">Commission</h3>
-                  <div className="breakdown-row highlight">
-                    <span className="row-label">Total Commission</span>
-                    <span className="row-value">{formatCurrency(result.commission)}</span>
-                  </div>
-                  
-                  <div className="tier-breakdown">
-                    {result.commissionBreakdown.map((tier, index) => (
-                      <div key={index} className="tier-row">
-                        <span className="tier-rate">{tier.rate}</span>
-                        <span className="tier-range">of {formatCurrency(tier.amount)}</span>
-                        <span className="tier-result">= {formatCurrency(tier.commission)}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="breakdown-group">
-                  <h3 className="group-title">Additional Earnings</h3>
-                  <div className="breakdown-row">
-                    <span className="row-label">
-                      Tips
-                      <span className="row-detail">(20% of gross)</span>
-                    </span>
-                    <span className="row-value">{formatCurrency(result.tips)}</span>
-                  </div>
-                  <div className="breakdown-row">
-                    <span className="row-label">
-                      Retail Commission
-                      <span className="row-detail">(10% of ${result.retailSales.toLocaleString()} sales)</span>
-                    </span>
-                    <span className="row-value">{formatCurrency(result.retailCommission)}</span>
-                  </div>
-                  <div className="breakdown-row">
-                    <span className="row-label">
-                      Retail Bonus
-                      <span className="row-detail">
-                        {result.retailThresholdMet 
-                          ? '($500+ threshold met)' 
-                          : '(need $500+ to qualify)'}
-                      </span>
-                    </span>
-                    <span className="row-value">{formatCurrency(result.retailBonus)}</span>
-                  </div>
-                </div>
-
-                <div className="breakdown-group summary">
-                  <div className="breakdown-row">
-                    <span className="row-label">Base Pay (before guarantee)</span>
-                    <span className="row-value">{formatCurrency(result.basePay)}</span>
-                  </div>
-                  <div className="breakdown-row">
-                    <span className="row-label">Hourly Guarantee ({result.hours}hrs × $15)</span>
-                    <span className="row-value">{formatCurrency(result.hourlyGuaranteePay)}</span>
-                  </div>
-                  <div className="breakdown-row total">
-                    <span className="row-label">Your Weekly Pay</span>
-                    <span className="row-value">{formatCurrency(result.totalPay)}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="info-card">
-                <h3>How This Works</h3>
-                <ul>
-                  <li><strong>Commission tiers:</strong> Higher productivity unlocks higher rates (42% → 50%)</li>
-                  <li><strong>Service fee:</strong> 10% of service revenue covers overhead</li>
-                  <li><strong>Tips:</strong> Calculated at 20% industry average</li>
-                  <li><strong>Retail:</strong> 10% commission on all sales + $50 bonus at $500+</li>
-                  <li><strong>Guarantee:</strong> You're guaranteed at least $15/hr for hours worked</li>
-                </ul>
-              </div>
-            </section>
           )}
 
+          {/* Inputs */}
+          <div className="input-section">
+            <h2 className="section-title">Adjust Your Numbers</h2>
+            
+            <div className="input-group">
+              <label>
+                <span className="label-text">Haircuts per week</span>
+                <span className="label-value">{weeklyCuts}</span>
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={weeklyCuts}
+                onChange={(e) => setWeeklyCuts(parseInt(e.target.value))}
+                className="slider"
+              />
+              <div className="slider-labels">
+                <span>0</span>
+                <span>25</span>
+                <span>50</span>
+                <span>75</span>
+                <span>100</span>
+              </div>
+            </div>
+
+            <div className="input-group">
+              <label>
+                <span className="label-text">Product sales per week</span>
+                <span className={`bonus-indicator ${weeklyRetailSales >= 500 ? '' : 'no-bonus'}`}>
+                  {weeklyRetailSales >= 500 ? '+$50 BONUS' : 'No bonus yet'}
+                </span>
+              </label>
+              <div className="currency-input-wrapper">
+                <span className="currency-symbol">$</span>
+                <input
+                  type="number"
+                  value={weeklyRetailSales || ''}
+                  onChange={(e) => setWeeklyRetailSales(Math.max(0, parseFloat(e.target.value) || 0))}
+                  className="currency-input"
+                  placeholder="0"
+                />
+              </div>
+              <p className="input-hint">Sell $500+ in products to unlock a $50 bonus</p>
+            </div>
+
+            <div className="input-group">
+              <label>
+                <span className="label-text">Hours per week</span>
+                <span className="label-value">{hoursPerWeek} hrs</span>
+              </label>
+              <input
+                type="range"
+                min="10"
+                max="40"
+                value={hoursPerWeek}
+                onChange={(e) => setHoursPerWeek(parseInt(e.target.value))}
+                className="slider"
+              />
+              <div className="slider-labels">
+                <span>10</span>
+                <span>20</span>
+                <span>30</span>
+                <span>40</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Simple Breakdown */}
+          {result && (
+            <div className="breakdown-section">
+              <h2 className="section-title">How You Earn It</h2>
+              
+              <div className="breakdown-row">
+                <span className="breakdown-label">
+                  Service Commission
+                  <span className="breakdown-sublabel">{result.cuts} cuts × $36, then your commission %</span>
+                </span>
+                <span className="breakdown-value">{formatCurrency(result.commission)}</span>
+              </div>
+
+              {result.commissionBreakdown.length > 0 && (
+                <div className="tier-details-wrapper">
+                  <button 
+                    className="tier-toggle"
+                    onClick={() => setShowTierDetails(!showTierDetails)}
+                  >
+                    {showTierDetails ? '▼ Hide' : '▶ Show'} commission breakdown
+                  </button>
+                  
+                  {showTierDetails && (
+                    <div className="tier-details">
+                      <div className="tier-details-header">
+                        <span>Your revenue: {formatCurrency(result.netRevenue)}</span>
+                      </div>
+                      {result.commissionBreakdown.map((tier, index) => (
+                        <div key={index} className="tier-detail-row">
+                          <span className="tier-rate">{tier.rate}</span>
+                          <span className="tier-of">of {formatCurrency(tier.amount)}</span>
+                          <span className="tier-equals">=</span>
+                          <span className="tier-result">{formatCurrency(tier.commission)}</span>
+                        </div>
+                      ))}
+                      <div className="tier-detail-total">
+                        <span>Total Commission</span>
+                        <span>{formatCurrency(result.commission)}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="breakdown-row">
+                <span className="breakdown-label">
+                  Tips
+                  <span className="breakdown-sublabel">~20% average from clients</span>
+                </span>
+                <span className="breakdown-value">{formatCurrency(result.tips)}</span>
+              </div>
+
+              <div className="breakdown-row">
+                <span className="breakdown-label">
+                  Retail Earnings
+                  <span className="breakdown-sublabel">
+                    10% of sales{result.retailBonus > 0 ? ' + $50 bonus!' : ''}
+                  </span>
+                </span>
+                <span className="breakdown-value">{formatCurrency(result.totalRetail)}</span>
+              </div>
+
+              <div className="breakdown-row breakdown-total">
+                <span className="breakdown-label">Your Earnings</span>
+                <span className="breakdown-value">{formatCurrency(result.basePay)}</span>
+              </div>
+
+              <div className="or-divider">— or —</div>
+
+              <div className="breakdown-row">
+                <span className="breakdown-label">
+                  Minimum Guarantee
+                  <span className="breakdown-sublabel">${HOURLY_WAGE}/hr × {result.hours} hours</span>
+                </span>
+                <span className="breakdown-value">{formatCurrency(result.hourlyGuaranteePay)}</span>
+              </div>
+
+              <p style={{fontSize: '0.8125rem', color: '#888', marginTop: '1rem', textAlign: 'center'}}>
+                <strong>You get whichever is higher.</strong> The guarantee is your safety net.
+              </p>
+            </div>
+          )}
+
+          {/* How It Works - Simplified */}
+          <div className="info-section">
+            <h3>The More You Do, The More You Make</h3>
+            <div className="info-grid">
+              <div className="info-item">
+                <h4>💇 Higher Volume = Higher Commission</h4>
+                <p>Your commission rate goes up as you do more business:</p>
+                <div className="tier-mini-table">
+                  <span>42%</span> → <span>44%</span> → <span>46%</span> → <span>48%</span> → <span>50%</span>
+                </div>
+              </div>
+              <div className="info-item">
+                <h4>🛍️ Retail Pays 10% + Bonuses</h4>
+                <p>Every product you sell puts 10% in your pocket. Hit $500/week and get an extra $50.</p>
+              </div>
+              <div className="info-item">
+                <h4>💵 You're Always Covered</h4>
+                <p>If your earnings come up short, you still get at least $15/hour. It's commission OR guarantee — whichever pays you more.</p>
+              </div>
+            </div>
+          </div>
+
           <footer className="footer">
-            <p>This calculator provides estimates only. Actual pay may vary.</p>
+            <p>Estimates based on typical performance. Your actual pay may vary.<br/>
+            Ready to join the team? Ask about open positions!</p>
           </footer>
         </div>
       );
@@ -1034,4 +815,3 @@
   </script>
 </body>
 </html>
-

@@ -485,76 +485,64 @@
       border-left: 3px solid var(--color-red);
     }
 
-    /* Commission Opportunities Section */
-    .commission-section {
+    /* Expandable Tier Details in Info Section */
+    .tier-expand-details {
+      margin-top: var(--space-md);
       background: var(--color-white);
-      border-radius: var(--radius-xl);
-      padding: var(--space-xl);
-      box-shadow: var(--shadow-lg);
-      margin-bottom: var(--space-lg);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
     }
 
-    .commission-intro {
-      font-size: 0.875rem;
-      color: var(--color-gray-600);
-      text-align: center;
-      margin-bottom: var(--space-lg);
-    }
-
-    .commission-ladder {
+    .tier-expand-details .commission-ladder {
       display: flex;
       flex-direction: column;
       gap: var(--space-sm);
     }
 
-    .commission-step {
+    .tier-expand-details .commission-step {
       display: flex;
       flex-direction: column;
       gap: var(--space-xs);
     }
 
-    .step-tier {
+    .tier-expand-details .step-tier {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
     }
 
-    .step-rate {
+    .tier-expand-details .step-rate {
       font-family: var(--font-heading);
-      font-size: 1.5rem;
+      font-size: 1.25rem;
       color: var(--color-black);
     }
 
-    .step-range {
-      font-size: 0.8125rem;
+    .tier-expand-details .step-range {
+      font-size: 0.75rem;
       color: var(--color-gray-500);
     }
 
-    .step-bar {
-      height: 8px;
+    .tier-expand-details .step-bar {
+      height: 6px;
       background: linear-gradient(90deg, var(--color-red) 0%, var(--color-red-dark) 100%);
-      border-radius: 4px;
-      transition: width 0.3s ease;
+      border-radius: 3px;
     }
 
-    .commission-step.featured .step-rate {
+    .tier-expand-details .commission-step.featured .step-rate {
       color: var(--color-red);
     }
 
-    .commission-step.featured .step-bar {
-      height: 12px;
+    .tier-expand-details .commission-step.featured .step-bar {
+      height: 10px;
       background: linear-gradient(90deg, var(--color-red) 0%, #FF6B6B 100%);
-      box-shadow: 0 2px 8px rgba(204, 0, 0, 0.3);
+      box-shadow: 0 2px 6px rgba(204, 0, 0, 0.3);
     }
 
-    .commission-note {
-      font-size: 0.8125rem;
-      color: var(--color-gray-600);
-      background: var(--color-gray-100);
-      padding: var(--space-md);
-      border-radius: var(--radius-md);
-      margin-top: var(--space-lg);
-      line-height: 1.6;
+    .tier-expand-note {
+      margin-top: var(--space-md);
+      font-size: 0.75rem;
+      color: var(--color-gray-500);
+      line-height: 1.5;
     }
 
     .footer {
@@ -610,7 +598,8 @@
       const [weeklyRetailSales, setWeeklyRetailSales] = useState(200);
       const [hoursPerWeek, setHoursPerWeek] = useState(32);
       const [result, setResult] = useState(null);
-      const [showTierDetails, setShowTierDetails] = useState(false);
+      const [showCommissionBreakdown, setShowCommissionBreakdown] = useState(false);
+      const [showTierLadder, setShowTierLadder] = useState(false);
 
       const calculateTieredCommission = useCallback((netRevenue) => {
         let commission = 0;
@@ -800,13 +789,14 @@
               {result.commissionBreakdown.length > 0 && (
                 <div className="tier-details-wrapper">
                   <button 
+                    type="button"
                     className="tier-toggle"
-                    onClick={() => setShowTierDetails(!showTierDetails)}
+                    onClick={(e) => { e.preventDefault(); setShowCommissionBreakdown(!showCommissionBreakdown); }}
                   >
-                    {showTierDetails ? '▼ Hide' : '▶ Show'} commission breakdown
+                    {showCommissionBreakdown ? '▼ Hide' : '▶ Show'} commission breakdown
                   </button>
                   
-                  {showTierDetails && (
+                  {showCommissionBreakdown && (
                     <div className="tier-details">
                       <div className="tier-explainer">
                         <p><strong>Here's how your commission is calculated:</strong></p>
@@ -887,58 +877,72 @@
             </div>
           )}
 
-          {/* Commission Opportunities */}
-          <div className="commission-section">
-            <h2 className="section-title">Commission Opportunities</h2>
-            <p className="commission-intro">The more business you bring in, the higher your commission rate. Here's how the tiers work:</p>
-            
-            <div className="commission-ladder">
-              <div className="commission-step">
-                <div className="step-tier">
-                  <span className="step-rate">42%</span>
-                  <span className="step-range">First $1,300</span>
-                </div>
-                <div className="step-bar" style={{width: '42%'}}></div>
-              </div>
-              <div className="commission-step">
-                <div className="step-tier">
-                  <span className="step-rate">44%</span>
-                  <span className="step-range">$1,300 – $1,600</span>
-                </div>
-                <div className="step-bar" style={{width: '50%'}}></div>
-              </div>
-              <div className="commission-step">
-                <div className="step-tier">
-                  <span className="step-rate">46%</span>
-                  <span className="step-range">$1,600 – $1,800</span>
-                </div>
-                <div className="step-bar" style={{width: '62%'}}></div>
-              </div>
-              <div className="commission-step">
-                <div className="step-tier">
-                  <span className="step-rate">48%</span>
-                  <span className="step-range">$1,800 – $2,000</span>
-                </div>
-                <div className="step-bar" style={{width: '78%'}}></div>
-              </div>
-              <div className="commission-step featured">
-                <div className="step-tier">
-                  <span className="step-rate">50%</span>
-                  <span className="step-range">Above $2,000</span>
-                </div>
-                <div className="step-bar" style={{width: '100%'}}></div>
-              </div>
-            </div>
-            
-            <p className="commission-note">
-              <strong>How it works:</strong> Your revenue is split across tiers. You earn 42% on your first $1,300, then 44% on the next $300, and so on. The more you earn, the more you keep!
-            </p>
-          </div>
-
           {/* Additional Info */}
           <div className="info-section">
             <h3>Good to Know</h3>
             <div className="info-grid">
+              <div className="info-item">
+                <h4>💇 Higher Volume = Higher Commission</h4>
+                <p>Your commission rate goes up as you do more business:</p>
+                <div className="tier-mini-table">
+                  <span>42%</span> → <span>44%</span> → <span>46%</span> → <span>48%</span> → <span>50%</span>
+                </div>
+                
+                <button 
+                  type="button"
+                  className="tier-toggle"
+                  onClick={(e) => { e.preventDefault(); setShowTierLadder(!showTierLadder); }}
+                  style={{marginTop: '0.75rem'}}
+                >
+                  {showTierLadder ? '▼ Hide' : '▶ See'} tier breakdown
+                </button>
+                
+                {showTierLadder && (
+                  <div className="tier-expand-details">
+                    <div className="commission-ladder">
+                      <div className="commission-step">
+                        <div className="step-tier">
+                          <span className="step-rate">42%</span>
+                          <span className="step-range">First $1,300</span>
+                        </div>
+                        <div className="step-bar" style={{width: '42%'}}></div>
+                      </div>
+                      <div className="commission-step">
+                        <div className="step-tier">
+                          <span className="step-rate">44%</span>
+                          <span className="step-range">$1,300 – $1,600</span>
+                        </div>
+                        <div className="step-bar" style={{width: '50%'}}></div>
+                      </div>
+                      <div className="commission-step">
+                        <div className="step-tier">
+                          <span className="step-rate">46%</span>
+                          <span className="step-range">$1,600 – $1,800</span>
+                        </div>
+                        <div className="step-bar" style={{width: '62%'}}></div>
+                      </div>
+                      <div className="commission-step">
+                        <div className="step-tier">
+                          <span className="step-rate">48%</span>
+                          <span className="step-range">$1,800 – $2,000</span>
+                        </div>
+                        <div className="step-bar" style={{width: '78%'}}></div>
+                      </div>
+                      <div className="commission-step featured">
+                        <div className="step-tier">
+                          <span className="step-rate">50%</span>
+                          <span className="step-range">Above $2,000</span>
+                        </div>
+                        <div className="step-bar" style={{width: '100%'}}></div>
+                      </div>
+                    </div>
+                    
+                    <p className="tier-expand-note">
+                      <strong>How it works:</strong> Your revenue is split across tiers. You earn 42% on your first $1,300, then 44% on the next $300, and so on. The more you earn, the more you keep!
+                    </p>
+                  </div>
+                )}
+              </div>
               <div className="info-item">
                 <h4>🛍️ Retail Pays Too</h4>
                 <p>Every product you sell puts 10% in your pocket. Hit $500/week and get an extra $50 bonus.</p>

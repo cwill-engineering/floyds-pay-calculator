@@ -577,7 +577,7 @@
 
     function FloydsPayCalculator() {
       // Pay structure constants
-      const SERVICE_PRICE = 38;
+      const SERVICE_PRICE = 36;
       const SERVICE_FEE_RATE = 0.10;
       const TIP_RATE = 0.20;
       const RETAIL_COMMISSION_RATE = 0.10;
@@ -781,7 +781,7 @@
               <div className="breakdown-row">
                 <span className="breakdown-label">
                   Service Commission
-                  <span className="breakdown-sublabel">{result.cuts} cuts × $38, then your commission %</span>
+                  <span className="breakdown-sublabel">{result.cuts} cuts × $36, then your commission %</span>
                 </span>
                 <span className="breakdown-value">{formatCurrency(result.commission)}</span>
               </div>
@@ -800,7 +800,7 @@
                     <div className="tier-details">
                       <div className="tier-explainer">
                         <p><strong>Here's how your commission is calculated:</strong></p>
-                        <p>You did <strong>{result.cuts} haircuts</strong> at $38 each = <strong>{formatCurrency(result.grossRevenue)}</strong> in services.</p>
+                        <p>You did <strong>{result.cuts} haircuts</strong> at $36 each = <strong>{formatCurrency(result.grossRevenue)}</strong> in services.</p>
                         <p>After the 10% service fee, your commissionable revenue is <strong>{formatCurrency(result.netRevenue)}</strong>.</p>
                         <p style={{marginTop: '0.75rem'}}>Your commission rate <em>increases</em> as you earn more:</p>
                       </div>
@@ -967,3 +967,4 @@
   </script>
 </body>
 </html>
+

@@ -580,17 +580,23 @@
       const SERVICE_PRICE = 38;
       const SERVICE_FEE_RATE = 0.10;
       const TIP_RATE = 0.20;
-      const RETAIL_COMMISSION_RATE = 0.10;
-      const RETAIL_THRESHOLD = 500;
-      const RETAIL_BONUS_AMOUNT = 50;
       const HOURLY_WAGE = 15;
 
+      // Service commission tiers (+2% bump from original)
       const COMMISSION_TIERS = [
-        { threshold: 1300, rate: 0.42, label: '42%' },
-        { threshold: 1600, rate: 0.44, label: '44%' },
-        { threshold: 1800, rate: 0.46, label: '46%' },
-        { threshold: 2000, rate: 0.48, label: '48%' },
-        { threshold: Infinity, rate: 0.50, label: '50%' },
+        { threshold: 1300, rate: 0.44, label: '44%' },
+        { threshold: 1600, rate: 0.46, label: '46%' },
+        { threshold: 1800, rate: 0.48, label: '48%' },
+        { threshold: 2000, rate: 0.50, label: '50%' },
+        { threshold: Infinity, rate: 0.52, label: '52%' },
+      ];
+
+      // Retail commission tiers (matching Floyd's structure)
+      const RETAIL_TIERS = [
+        { threshold: 50, rate: 0.05, label: '5%' },
+        { threshold: 100, rate: 0.10, label: '10%' },
+        { threshold: 200, rate: 0.20, label: '20%' },
+        { threshold: Infinity, rate: 0.30, label: '30%' },
       ];
 
       // User inputs
@@ -629,6 +635,34 @@
         return { total: commission, breakdown };
       }, []);
 
+      // Calculate retail commission using Floyd's tiered structure
+      const calculateRetailCommission = useCallback((retailSales) => {
+        if (retailSales <= 0) return { total: 0, rate: '0%', tierLabel: 'No sales' };
+        
+        // Find which tier the retail sales fall into (flat tier, not progressive)
+        let appliedTier = RETAIL_TIERS[RETAIL_TIERS.length - 1];
+        let prevThreshold = 0;
+        
+        for (const tier of RETAIL_TIERS) {
+          if (retailSales < tier.threshold) {
+            appliedTier = tier;
+            break;
+          }
+          prevThreshold = tier.threshold;
+        }
+        
+        const commission = retailSales * appliedTier.rate;
+        const tierLabel = retailSales < 50 ? '$0-$49.99' :
+                         retailSales < 100 ? '$50-$99.99' :
+                         retailSales < 200 ? '$100-$199.99' : '$200+';
+        
+        return { 
+          total: commission, 
+          rate: appliedTier.label, 
+          tierLabel: tierLabel 
+        };
+      }, []);
+
       const calculatePay = useCallback(() => {
         const cuts = parseInt(weeklyCuts) || 0;
         const retailSales = parseFloat(weeklyRetailSales) || 0;
@@ -640,10 +674,14 @@
         const commissionResult = calculateTieredCommission(netRevenue);
         const commission = commissionResult.total;
         const tips = grossRevenue * TIP_RATE;
-        const retailCommission = retailSales * RETAIL_COMMISSION_RATE;
-        const retailBonus = retailSales >= RETAIL_THRESHOLD ? RETAIL_BONUS_AMOUNT : 0;
-        const totalRetail = retailCommission + retailBonus;
-        const basePay = commission + tips + totalRetail;
+        
+        // Use tiered retail commission (matching Floyd's structure)
+        const retailResult = calculateRetailCommission(retailSales);
+        const retailCommission = retailResult.total;
+        const retailRate = retailResult.rate;
+        const retailTierLabel = retailResult.tierLabel;
+        
+        const basePay = commission + tips + retailCommission;
         const totalPay = Math.max(basePay, hourlyGuaranteePay);
         const guaranteeApplied = basePay < hourlyGuaranteePay;
         const effectiveHourly = hours > 0 ? totalPay / hours : 0;
@@ -659,14 +697,14 @@
           commissionBreakdown: commissionResult.breakdown,
           tips,
           retailCommission,
-          retailBonus,
-          totalRetail,
+          retailRate,
+          retailTierLabel,
           basePay,
           totalPay,
           effectiveHourly,
           guaranteeApplied,
         };
-      }, [weeklyCuts, weeklyRetailSales, hoursPerWeek, calculateTieredCommission]);
+      }, [weeklyCuts, weeklyRetailSales, hoursPerWeek, calculateTieredCommission, calculateRetailCommission]);
 
       useEffect(() => {
         setResult(calculatePay());
@@ -734,8 +772,8 @@
             <div className="input-group">
               <label>
                 <span className="label-text">Product sales per week</span>
-                <span className={`bonus-indicator ${weeklyRetailSales >= 500 ? '' : 'no-bonus'}`}>
-                  {weeklyRetailSales >= 500 ? '+$50 BONUS' : 'No bonus yet'}
+                <span className={`bonus-indicator ${weeklyRetailSales >= 200 ? '' : 'no-bonus'}`}>
+                  {weeklyRetailSales >= 200 ? '30% rate' : weeklyRetailSales >= 100 ? '20% rate' : weeklyRetailSales >= 50 ? '10% rate' : '5% rate'}
                 </span>
               </label>
               <div className="currency-input-wrapper">
@@ -748,7 +786,7 @@
                   placeholder="0"
                 />
               </div>
-              <p className="input-hint">Sell $500+ in products to unlock a $50 bonus</p>
+              <p className="input-hint">Sell $200+ to earn 30% commission on retail</p>
             </div>
 
             <div className="input-group">
@@ -831,7 +869,7 @@
                       </div>
                       
                       <div className="tier-tip">
-                        💡 <strong>Tip:</strong> The more cuts you do, the higher your rate goes! Top performers earn 50% on revenue above $2,000.
+                        💡 <strong>Tip:</strong> The more cuts you do, the higher your rate goes! Top performers earn 52% on revenue above $2,000.
                       </div>
                     </div>
                   )}
@@ -850,10 +888,10 @@
                 <span className="breakdown-label">
                   Retail Earnings
                   <span className="breakdown-sublabel">
-                    10% of sales{result.retailBonus > 0 ? ' + $50 bonus!' : ''}
+                    {result.retailRate} of ${result.retailSales.toLocaleString()} ({result.retailTierLabel} tier)
                   </span>
                 </span>
-                <span className="breakdown-value">{formatCurrency(result.totalRetail)}</span>
+                <span className="breakdown-value">{formatCurrency(result.retailCommission)}</span>
               </div>
 
               <div className="breakdown-row breakdown-total">
@@ -885,7 +923,7 @@
                 <h4>💇 Higher Volume = Higher Commission</h4>
                 <p>Your commission rate goes up as you do more business:</p>
                 <div className="tier-mini-table">
-                  <span>42%</span> → <span>44%</span> → <span>46%</span> → <span>48%</span> → <span>50%</span>
+                  <span>44%</span> → <span>46%</span> → <span>48%</span> → <span>50%</span> → <span>52%</span>
                 </div>
                 
                 <button 
@@ -902,35 +940,35 @@
                     <div className="commission-ladder">
                       <div className="commission-step">
                         <div className="step-tier">
-                          <span className="step-rate">42%</span>
+                          <span className="step-rate">44%</span>
                           <span className="step-range">First $1,300</span>
                         </div>
-                        <div className="step-bar" style={{width: '42%'}}></div>
-                      </div>
-                      <div className="commission-step">
-                        <div className="step-tier">
-                          <span className="step-rate">44%</span>
-                          <span className="step-range">$1,300 – $1,600</span>
-                        </div>
-                        <div className="step-bar" style={{width: '50%'}}></div>
+                        <div className="step-bar" style={{width: '44%'}}></div>
                       </div>
                       <div className="commission-step">
                         <div className="step-tier">
                           <span className="step-rate">46%</span>
-                          <span className="step-range">$1,600 – $1,800</span>
+                          <span className="step-range">$1,300 – $1,600</span>
                         </div>
-                        <div className="step-bar" style={{width: '62%'}}></div>
+                        <div className="step-bar" style={{width: '52%'}}></div>
                       </div>
                       <div className="commission-step">
                         <div className="step-tier">
                           <span className="step-rate">48%</span>
+                          <span className="step-range">$1,600 – $1,800</span>
+                        </div>
+                        <div className="step-bar" style={{width: '64%'}}></div>
+                      </div>
+                      <div className="commission-step">
+                        <div className="step-tier">
+                          <span className="step-rate">50%</span>
                           <span className="step-range">$1,800 – $2,000</span>
                         </div>
-                        <div className="step-bar" style={{width: '78%'}}></div>
+                        <div className="step-bar" style={{width: '80%'}}></div>
                       </div>
                       <div className="commission-step featured">
                         <div className="step-tier">
-                          <span className="step-rate">50%</span>
+                          <span className="step-rate">52%</span>
                           <span className="step-range">Above $2,000</span>
                         </div>
                         <div className="step-bar" style={{width: '100%'}}></div>
@@ -938,14 +976,17 @@
                     </div>
                     
                     <p className="tier-expand-note" style={{marginTop: '1.25rem'}}>
-                      <strong>How it works:</strong> Your revenue is split across tiers. You earn 42% on your first $1,300, then 44% on the next $300, and so on. The more you earn, the more you keep!
+                      <strong>How it works:</strong> Your revenue is split across tiers. You earn 44% on your first $1,300, then 46% on the next $300, and so on. The more you earn, the more you keep!
                     </p>
                   </div>
                 )}
               </div>
               <div className="info-item">
                 <h4>🛍️ Retail Pays Too</h4>
-                <p>Every product you sell puts 10% in your pocket. Hit $500/week and <strong>get an extra $50 bonus</strong>.</p>
+                <p>Retail commission increases with volume:</p>
+                <div className="tier-mini-table">
+                  <span>5% ($0-49)</span> → <span>10% ($50-99)</span> → <span>20% ($100-199)</span> → <span>30% ($200+)</span>
+                </div>
               </div>
               <div className="info-item">
                 <h4>💵 You're Always Covered</h4>
@@ -967,5 +1008,3 @@
   </script>
 </body>
 </html>
-
-
